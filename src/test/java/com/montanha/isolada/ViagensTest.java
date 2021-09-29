@@ -33,6 +33,23 @@ public class ViagensTest
         .then()
             .extract()
                 .path("data.token");
-        System.out.println(token);
+
+        given()
+            .contentType(io.restassured.http.ContentType.JSON)
+            .body("{\n" +
+                    "\t\"acompanhante\": \"Jamile\",\n" +
+                    "\t\"dataPartida\": \"2021-09-30\",\n" +
+                    "\t\"dataRetorno\": \"2021-10-01\",\n" +
+                    "\t\"localDeDestino\": \"Itaperuçu\",\n" +
+                    "\t\"regiao\": \"Sul\"\n" +
+                    "}")
+            .header("Authorization", token)
+        .when()
+            .post("/v1/viagens")
+        .then()
+            .assertThat()
+                .statusCode(201)
+                .body("data.localDeDestino",equalTo("Itaperuçu"))
+                .body("data.acompanhante", equalToIgnoringCase("jamile"));
     }
 }
