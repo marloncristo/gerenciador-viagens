@@ -21,6 +21,7 @@ public class ViagensTest
         port = 8089;
         basePath =  "/api";
 
+        String token =
         given()
             .contentType(io.restassured.http.ContentType.JSON)
             .body("{\n" +
@@ -30,7 +31,8 @@ public class ViagensTest
         .when()
             .post("/v1/auth")
         .then()
-            .log()
-                .all();
+            .extract()
+                .path("data.token");
+        System.out.println(token);
     }
 }
