@@ -1,5 +1,9 @@
 package com.montanha.isolada;
 
+import com.montanha.factory.UsuarioDataFactory;
+import com.montanha.factory.ViagemDataFactory;
+import com.montanha.pojo.Usuario;
+import com.montanha.pojo.Viagem;
 import io.restassured.http.ContentType;
 import org.junit.Test;
 import static io.restassured.RestAssured.*;
@@ -21,28 +25,23 @@ public class ViagensTest
         port = 8089;
         basePath =  "/api";
 
+        Usuario usuarioAdministrador = UsuarioDataFactory.criarUsuarioAdministrador();
+
         String token =
         given()
             .contentType(io.restassured.http.ContentType.JSON)
-            .body("{\n" +
-                    "\t\"email\": \"admin@email.com\",\n" +
-                    "\t\"senha\": \"654321\"\n" +
-                    "}")
+            .body(usuarioAdministrador)
         .when()
             .post("/v1/auth")
         .then()
             .extract()
                 .path("data.token");
 
+        Viagem viagemValida = ViagemDataFactory.criarViagemValida();
+
         given()
             .contentType(io.restassured.http.ContentType.JSON)
-            .body("{\n" +
-                    "\t\"acompanhante\": \"Jamile\",\n" +
-                    "\t\"dataPartida\": \"2021-09-30\",\n" +
-                    "\t\"dataRetorno\": \"2021-10-01\",\n" +
-                    "\t\"localDeDestino\": \"Itaperuçu\",\n" +
-                    "\t\"regiao\": \"Sul\"\n" +
-                    "}")
+            .body(viagemValida)
             .header("Authorization", token)
         .when()
             .post("/v1/viagens")
@@ -50,6 +49,6 @@ public class ViagensTest
             .assertThat()
                 .statusCode(201)
                 .body("data.localDeDestino",equalTo("Itaperuçu"))
-                .body("data.acompanhante", equalToIgnoringCase("jamile"));
+                .body("data.acompanhante", equalToIgnoringCase("marlon"));
     }
 }
